@@ -13,6 +13,33 @@ const config = {
     measurementId: "G-2B15J06SJR"
   };
 
+  export const createUserProfileDocument = async (userAuth,additionalData) => {
+    if(!userAuth) return;
+
+    const userRef = firestore.doc(`users/${userAuth.uid}`);
+    const snapshot = await userRef.get();
+    // console.log(snapshot);
+
+    if(!snapshot.exists){
+      const {displayName,email} = userAuth;
+      const createAt = new Date();
+
+      try {
+        await userRef.set({
+          displayName,
+          email,
+          createAt,
+          ...additionalData
+        })
+      } catch (error) {
+        console.log('error creating user',error.message);
+      }
+    }
+
+    return userRef;
+    // console.log(firestore.doc('users/1283635dddff'));
+  }
+
   firebase.initializeApp(config);
   // firebase.analytics();
   export const auth = firebase.auth();
